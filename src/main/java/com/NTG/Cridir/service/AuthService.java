@@ -15,6 +15,8 @@ import com.NTG.Cridir.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -83,17 +85,55 @@ public class AuthService {
     }
 
     // ----------------- RESET PASSWORD -----------------
-    public void resetPassword(ResetPasswordRequest request) {
-        String email = jwtService.extractEmail(request.token());
+//    public void resetPassword(ResetPasswordRequest request) {
+//        String email = jwtService.extractEmail(request.token());
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("Invalid token"));
+//
+//        if (passwordEncoder.matches(request.newPassword(), user.getPassword()))
+//            throw new RuntimeException("New password cannot be the same as the old password");
+//
+//        user.setPassword(passwordEncoder.encode(request.newPassword()));
+//        userRepository.save(user);
+//    }
+
+
+
+    // -------- VERIFY RESET CODE --------
+    public void verifyResetCode(String email, String code) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (passwordEncoder.matches(request.newPassword(), user.getPassword()))
-            throw new RuntimeException("New password cannot be the same as the old password");
+        if (user.getResetCode() == null || user.getResetCodeExpiry() == null) {
+            throw new RuntimeException("No reset code found");
+        }
 
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        if (!user.getResetCode().equals(code) || user.getResetCodeExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Invalid or expired reset code");
+        }
+
+        //  verification success
+        user.setResetCode(null);
+        user.setResetCodeExpiry(null);
+        user.setResetVerified(true);
         userRepository.save(user);
     }
+
+    // -------- RESET PASSWORD --------
+    public void resetPassword(ResetPasswordRequest request) {
+        User user = userRepository.findByResetVerifiedTrue()
+                .orElseThrow(() -> new RuntimeException("No verified reset request found"));
+
+        if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+            throw new RuntimeException("New password cannot be the same as the old password");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setResetVerified(false); // clear verification flag
+        userRepository.save(user);
+    }
+
+
 
     // ----------------- Helpers -----------------
     private void validateSignup(SignupRequest request) {

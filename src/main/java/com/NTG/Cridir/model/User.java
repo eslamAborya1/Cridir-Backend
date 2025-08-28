@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Data @NoArgsConstructor @AllArgsConstructor
@@ -28,5 +30,13 @@ public class User {
     @Column(nullable = false)
     private boolean enabled = false;
 
+    @Column
+    private String resetCode;
+
+    @Column
+    private LocalDateTime resetCodeExpiry;
+
+    @Column(nullable = false)
+    private boolean resetVerified = false;
 
 }
