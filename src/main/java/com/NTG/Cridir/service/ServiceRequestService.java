@@ -4,9 +4,15 @@ import com.NTG.Cridir.DTOs.ServiceRequestDTO;
 import com.NTG.Cridir.DTOs.ServiceRequestResponse;
 import com.NTG.Cridir.exception.NotFoundException;
 import com.NTG.Cridir.mapper.ServiceRequestMapper;
-import com.NTG.Cridir.model.*;
+import com.NTG.Cridir.model.Customer;
 import com.NTG.Cridir.model.Enum.Status;
-import com.NTG.Cridir.repository.*;
+import com.NTG.Cridir.model.Location;
+import com.NTG.Cridir.model.Provider;
+import com.NTG.Cridir.model.ServiceRequest;
+import com.NTG.Cridir.repository.CustomerRepository;
+import com.NTG.Cridir.repository.LocationRepository;
+import com.NTG.Cridir.repository.ProviderRepository;
+import com.NTG.Cridir.repository.ServiceRequestRepository;
 import com.NTG.Cridir.util.GeoUtils;
 import com.NTG.Cridir.util.PricingUtils;
 import org.springframework.stereotype.Service;
@@ -22,39 +28,61 @@ public class ServiceRequestService {
     private final ServiceRequestRepository serviceRequestRepository;
     private final CustomerRepository customerRepository;
     private final ProviderRepository providerRepository;
+    private final JwtService jwtService;
     private final LocationRepository locationRepository;
     private final ServiceRequestMapper mapper;
 
     public ServiceRequestService(ServiceRequestRepository serviceRequestRepository,
                                  CustomerRepository customerRepository,
                                  ProviderRepository providerRepository,
-                                 LocationRepository locationRepository,
+                                 JwtService jwtService, LocationRepository locationRepository,
                                  ServiceRequestMapper mapper) {
         this.serviceRequestRepository = serviceRequestRepository;
         this.customerRepository = customerRepository;
         this.providerRepository = providerRepository;
+        this.jwtService = jwtService;
         this.locationRepository = locationRepository;
         this.mapper = mapper;
     }
 
     // Customer creates a request
-    public ServiceRequestResponse createRequest(ServiceRequestDTO dto) {
-        Customer customer = customerRepository.findById(dto.customerId())
-                .orElseThrow(() -> new NotFoundException("Customer not found"));
+//    public ServiceRequestResponse createRequest(ServiceRequestDTO dto) {
+//        Customer customer = customerRepository.findById(dto.)
+//                .orElseThrow(() -> new NotFoundException("Customer not found"));
+//
+//        // location
+//        Location location = new Location();
+//        mapper.updateLocationFromDto(dto, location);
+//        locationRepository.save(location);
+//
+//        // request
+//        ServiceRequest request = mapper.toEntity(dto);
+//        request.setCustomer(customer);
+//        request.setLocation(location);
+//
+//        serviceRequestRepository.save(request);
+//        return mapper.toResponse(request);
+//    }
+    public ServiceRequestResponse createRequest(ServiceRequestDTO dto, Long userId) {
+        ServiceRequest request = mapper.toEntity(dto);
 
-        // location
+        // اربط الـ customer بالـ userId
+        Customer customer = customerRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        request.setCustomer(customer);
+
+        // اعمل location
         Location location = new Location();
         mapper.updateLocationFromDto(dto, location);
-        locationRepository.save(location);
-
-        // request
-        ServiceRequest request = mapper.toEntity(dto);
-        request.setCustomer(customer);
+        location = locationRepository.save(location);
         request.setLocation(location);
 
-        serviceRequestRepository.save(request);
-        return mapper.toResponse(request);
+        ServiceRequest saved = serviceRequestRepository.save(request);
+        return mapper.toResponse(saved);
     }
+
+
+
 
     public ServiceRequestResponse updateStatus(Long requestId, Status status) {
         ServiceRequest request = findRequestById(requestId);

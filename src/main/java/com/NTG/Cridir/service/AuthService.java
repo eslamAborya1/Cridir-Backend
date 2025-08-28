@@ -1,6 +1,9 @@
 package com.NTG.Cridir.service;
 
-import com.NTG.Cridir.DTOs.*;
+import com.NTG.Cridir.DTOs.AuthResponse;
+import com.NTG.Cridir.DTOs.LoginRequest;
+import com.NTG.Cridir.DTOs.ResetPasswordRequest;
+import com.NTG.Cridir.DTOs.SignupRequest;
 import com.NTG.Cridir.mapper.UserMapper;
 import com.NTG.Cridir.model.Customer;
 import com.NTG.Cridir.model.Enum.Role;

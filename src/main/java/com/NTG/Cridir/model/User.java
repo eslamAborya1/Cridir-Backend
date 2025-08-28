@@ -2,7 +2,9 @@ package com.NTG.Cridir.model;
 
 import com.NTG.Cridir.model.Enum.Role;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")

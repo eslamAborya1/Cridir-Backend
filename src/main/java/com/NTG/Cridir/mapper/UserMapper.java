@@ -5,15 +5,13 @@ import com.NTG.Cridir.DTOs.UserProfileDTO;
 import com.NTG.Cridir.DTOs.UserUpdateRequest;
 import com.NTG.Cridir.model.User;
 import org.mapstruct.*;
-import org.springframework.stereotype.Component;
 
 @Mapper(componentModel = "spring")
-@Component
 public interface UserMapper {
 
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "enabled", constant = "false")
-    @Mapping(target = "password", ignore = true) // هيتعمل encode بعدين
+    @Mapping(target = "password", ignore = true)
     User toEntity(SignupRequest request);
 
     // mapping User → UserProfileDTO

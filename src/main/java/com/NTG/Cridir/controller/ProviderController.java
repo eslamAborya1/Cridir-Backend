@@ -3,7 +3,6 @@ package com.NTG.Cridir.controller;
 import com.NTG.Cridir.DTOs.AvailabilityResponse;
 import com.NTG.Cridir.DTOs.ProviderAvailabilityRequest;
 import com.NTG.Cridir.DTOs.ProviderResponseDTO;
-import com.NTG.Cridir.model.Provider;
 import com.NTG.Cridir.repository.ProviderRepository;
 import com.NTG.Cridir.service.ProviderService;
 import jakarta.validation.Valid;

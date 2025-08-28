@@ -23,11 +23,11 @@ public class EmailService {
         this.userRepository = userRepository;
     }
 
-    @Value("${app.frontend.base-url}")
+    @Value("${app.server.base-url}")
     private String appBaseUrl;
 
     public void sendActivationEmail(User user, String token) {
-        String activationLink = appBaseUrl + "/activate?token=" + token;
+        String activationLink = appBaseUrl + "/auth/activate?token=" + token;
 
         String subject = "Activate your Cridir account";
         String body = "<p>Hello " + user.getName() + ",</p>"
